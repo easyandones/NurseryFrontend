@@ -2,13 +2,13 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomePage from './pages/HomePage/HomePage';
-import NurseryPage from './pages/NurseryPage/NurseryPage';
-import ArticlePage from './pages/ArticlePage/ArticlePage';
-import RegisterPage from './pages/RegisterPage/RegisterPage';
-import LoginPage from './pages/LoginPage/LoginPage';
-import ArticleWritePage from './pages/ArticleWritePage/ArticleWritePage';
-import ArticleViewPage from './pages/ArticleViewPage/ArticleViewPage';
+import HomePage from './src/pages/HomePage/HomePage';
+import NurseryPage from './src/pages/NurseryPage/NurseryPage';
+import ArticlePage from './src/pages/ArticlePage/ArticlePage';
+import RegisterPage from './src/pages/RegisterPage/RegisterPage';
+import LoginPage from './src/pages/LoginPage/LoginPage';
+import ArticleWritePage from './src/pages/ArticleWritePage/ArticleWritePage';
+import ArticleViewPage from './src/pages/ArticleViewPage/ArticleViewPage';
 
 const Stack = createNativeStackNavigator();
 

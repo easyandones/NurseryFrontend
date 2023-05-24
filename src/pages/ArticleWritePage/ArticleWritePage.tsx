@@ -1,10 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
 import LineEdit from '../../components/LineEdit/LineEdit';
+import {Picker} from '@react-native-picker/picker';
 
 
 const ArticleWritePage = (props: any) => {
     const [article, setArticle] = useState(props.route.params?.article);
+    const [boardType, setBoardType] = useState(props.route.params?.article?.boardType || props.route.params.boardType);
     const [title, setTitle] = useState(article ? article.title : "");
     const [content, setContent] = useState(article ? article.content : "");
 
@@ -38,9 +40,22 @@ const ArticleWritePage = (props: any) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>
-                게시글 {article ? "수정" : "작성"}
-            </Text>
+            <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
+                <Text style={styles.title}>
+                    게시글 {article ? "수정" : "작성"}
+                </Text>
+                <View style={{borderRadius: 10, flex: 1, overflow: "hidden"}}>
+                    <Picker
+                        selectedValue={boardType}
+                        onValueChange={(itemValue, itemIndex) => setBoardType(itemValue)}
+                        style={{backgroundColor: "#f0f0f0"}}
+                    >
+                        <Picker.Item label="공지사항" value="notice" />
+                        <Picker.Item label="자유게시판" value="anything" />
+                        <Picker.Item label="Q&A" value="qna" />
+                    </Picker>
+                </View>
+            </View>
             <View style={styles.formArea}>
                 <LineEdit
                     value={title}
@@ -69,16 +84,17 @@ const ArticleWritePage = (props: any) => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 30,
-      paddingVertical: 20,
+      paddingHorizontal: 10,
+      paddingVertical: 10,
       backgroundColor: "white",
     },
     title: {
-        fontSize: 30,
+        fontSize: 25,
+        flex: 1,
     },
     formArea: {
-        gap: 30,
-        marginTop: 30,
+        gap: 10,
+        marginTop: 15,
         flex: 1,
     },
     inputTitle: {
@@ -86,8 +102,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     lineEdit: {
-        backgroundColor: "lightgray",
-        padding: 20,
+        backgroundColor: "#f0f0f0",
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 15,
     },
 });
 

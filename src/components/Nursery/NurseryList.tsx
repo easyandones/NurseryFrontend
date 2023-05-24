@@ -10,8 +10,8 @@ const NurseryList = (props: any) => {
     const [loading, setLoading] = useState(false);
     const [hasNextPage, setHasNextPage] = useState(true);
     const [cursor, setCursor] = useState("");
-    const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+    const isCloseToBottom = (event: any) => {
+        return event.layoutMeasurement.height + event.contentOffset.y >= event.contentSize.height - 20;
     };
     const getNurseryList = async() => {
         if (loading || !hasNextPage) {
