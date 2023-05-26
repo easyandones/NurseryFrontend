@@ -1,4 +1,4 @@
-import Comment from './CommentType';
+import Comment from '../../Types/CommentType';
 
 import { FontAwesome } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
@@ -9,8 +9,8 @@ const CommentView = (props: any) => {
     return (
         <View style={styles.container}>
             <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
-                <Image style={styles.userProfileImage} source={{uri: comment.userProfileImage}} />
-                <Text style={{fontWeight: "500"}}>{comment.userName}</Text>
+                <Image style={styles.userProfileImage} source={{uri: comment.user.profileImageURL}} />
+                <Text style={{fontWeight: "500"}}>{comment.user.displayName}</Text>
                 {comment.isOwner ?
                     <View style={{flexDirection: "row", marginLeft: "auto", alignItems: "center"}}>
                         <TouchableOpacity onPress={props.commentDeleteHandler} style={{borderRadius: 5, backgroundColor: "red", paddingHorizontal: 12, paddingVertical: 8}}>

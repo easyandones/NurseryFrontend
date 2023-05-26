@@ -1,13 +1,13 @@
+import User from "./User";
 import Comment from "./CommentType";
 
 type Article = {
     id: number;
     boardType: string;
-    userId: number;
-    userName: string;
-    userProfileImage: string;
+    user: User;
     title: string;
     content: string;
+    attachedImageURL: string[];
     createdAt: string;
     likesCount: number;
     comments: Comment[];

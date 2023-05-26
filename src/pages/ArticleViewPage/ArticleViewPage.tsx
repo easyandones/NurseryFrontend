@@ -1,11 +1,14 @@
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Image, Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
-import { Feather, FontAwesome } from '@expo/vector-icons';
+import { Feather, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import LineEdit from '../../components/LineEdit/LineEdit';
 import { useIsFocused } from '@react-navigation/native';
-import Comment from '../../components/Article/CommentType';
+import Comment from '../../Types/CommentType';
 import CommentView from '../../components/Article/CommentView';
+import Article from '../../Types/ArticleType';
 
+
+const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");
 
 const ArticleViewPage = (props: any) => {
     const [loading, setLoading] = useState(true);
@@ -16,7 +19,7 @@ const ArticleViewPage = (props: any) => {
     const refreshArticle = async() => {
         setLoading(true);
         console.log("refresh article"); //게시글 불러오는 API
-        const response = await fetch("https://hub.dummyapis.com/delay?seconds=1");
+        //const response = await fetch("https://hub.dummyapis.com/delay?seconds=1");
         //const response = await fetch(
             //`https://api.kmu_wink.com/article?id=${article.id}&token=${OAUTH_TOKEN}`,
             //{
@@ -24,8 +27,9 @@ const ArticleViewPage = (props: any) => {
             //}
         //);
         //const json = await response.json();
-        const json: any = props.route.params.article;
-        setArticle(json);
+        const json = props.route.params.article; //임시 데이터
+        const article: Article = json;
+        setArticle(article);
         setLoading(false);
     };
     useEffect(() => {
@@ -45,10 +49,7 @@ const ArticleViewPage = (props: any) => {
         }
     };
 
-
     const editArticle = async() => {
-        //수정 API
-        console.log("edit", article.id);
         props.navigation.navigate('게시글 작성', {article});
     };
 
@@ -87,56 +88,67 @@ const ArticleViewPage = (props: any) => {
 
     return (
         <View style={styles.container}>
-            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
-                    <Image style={styles.userProfileImage} source={{uri: article.userProfileImage}} />
-                    <View>
-                        <Text style={{fontSize: 18, fontWeight: "500"}}>{article.userName}</Text>
-                        <Text style={{fontSize: 13, color: "gray"}}>{article.createdAt}</Text>
+            <ScrollView>
+                <View style={styles.scrollArea}>
+                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                        <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+                            <Image style={styles.userProfileImage} source={{uri: article.user.profileImageURL}} />
+                            <View>
+                                <Text style={{fontSize: 18, fontWeight: "500"}}>{article.user.displayName}</Text>
+                                <Text style={{fontSize: 13, color: "gray"}}>{article.createdAt}</Text>
+                            </View>
+                        </View>
+                        {article.isOwner ?
+                            <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
+                                <TouchableOpacity onPress={editArticle} style={{borderRadius: 10, backgroundColor: "orange", paddingHorizontal: 15, paddingVertical: 8}}>
+                                    <FontAwesome name="edit" size={18} color="white" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={deleteArticle} style={{borderRadius: 10, backgroundColor: "red", paddingHorizontal: 15, paddingVertical: 8}}>
+                                    <FontAwesome name="trash" size={18} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                        :
+                            null
+                        }
+                    </View>
+                    <View style={styles.contentArea}>
+                        <Text style={styles.title}>
+                            {article.title}
+                        </Text>
+                        <Text style={styles.content}>
+                            {article.content}
+                        </Text>
+                        {
+                            article.attachedImageURL.map((url: string, index: number) => (
+                                <Image key={index} style={styles.attatchedImage} source={{uri: url}} />
+                            ))
+                        }
+                    </View>
+                    <View style={{flexDirection: "row", marginVertical: 5, gap: 5}}>
+                        <TouchableOpacity onPress={toggleLike} style={{flexDirection: "row", alignItems: "center", gap: 5, borderRadius: 10, backgroundColor: article.liked ? "#ffd9d9" : "#f0f0f0", paddingHorizontal: 10, paddingVertical: 4}}>
+                            <FontAwesome name={article.liked ? "heart" : "heart-o"} size={18} color={article.liked ? "red" : "black"} />
+                            <Text style={{fontSize: 16, fontWeight: "500", color: article.liked ? "red" : "black"}}>{article.likesCount}</Text>
+                        </TouchableOpacity>
+                        <View style={{flexDirection: "row", alignItems: "center", gap: 5, borderRadius: 10, backgroundColor: "#f0f0f0", paddingHorizontal: 10, paddingVertical: 4}}>
+                            <MaterialIcons name="comment" size={18} color="black" />
+                            <Text style={{fontSize: 16, fontWeight: "500", color: "black"}}>{article.comments.length}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.commentArea}>
+                        {article.comments.length ?
+                            <View style={{gap: 5}}>
+                                {
+                                    article.comments.map((comment: Comment, index: number) => (
+                                        <CommentView key={comment.id} comment={comment} commentDeleteHandler={() => deleteComment(comment.id)} />
+                                    ))
+                                }
+                            </View>
+                        :
+                            <Text style={{textAlign: "center", fontSize: 15, fontWeight: "bold", padding: 10}}>댓글이 없습니다.</Text>
+                        }
                     </View>
                 </View>
-                {article.isOwner ?
-                    <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
-                        <TouchableOpacity onPress={editArticle} style={{borderRadius: 10, backgroundColor: "orange", paddingHorizontal: 15, paddingVertical: 8}}>
-                            <FontAwesome name="edit" size={18} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={deleteArticle} style={{borderRadius: 10, backgroundColor: "red", paddingHorizontal: 15, paddingVertical: 8}}>
-                            <FontAwesome name="trash" size={18} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                :
-                    null
-                }
-            </View>
-            <View style={styles.contentArea}>
-                <Text style={styles.title}>
-                    {article.title}
-                </Text>
-                <Text style={styles.content}>
-                    {article.content}
-                </Text>
-            </View>
-            <View style={{flexDirection: "row", marginVertical: 5}}>
-                <TouchableOpacity onPress={toggleLike} style={{flexDirection: "row", alignItems: "center", gap: 5, borderRadius: 10, backgroundColor: article.liked ? "#ffd9d9" : "#f0f0f0", paddingHorizontal: 10, paddingVertical: 4}}>
-                    <FontAwesome name={article.liked ? "heart" : "heart-o"} size={18} color={article.liked ? "red" : "black"} />
-                    <Text style={{fontSize: 16, fontWeight: "500", color: article.liked ? "red" : "black"}}>{article.likesCount}</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.commentArea}>
-                {article.comments.length ?
-                    <ScrollView>
-                        <View style={{gap: 5}}>
-                            {
-                                article.comments.map((comment: Comment, index: number) => (
-                                    <CommentView key={comment.id} comment={comment} commentDeleteHandler={() => deleteComment(comment.id)} />
-                                ))
-                            }
-                        </View>
-                    </ScrollView>
-                :
-                    <Text style={{textAlign: "center", fontSize: 15, fontWeight: "bold", padding: 10}}>댓글이 없습니다.</Text>
-                }
-            </View>
+            </ScrollView>
             <View style={{flexDirection: "row", gap: 10, backgroundColor: "lightgray", borderRadius: 10, padding: 5}}>
                 <LineEdit
                     value={comment}
@@ -155,11 +167,15 @@ const ArticleViewPage = (props: any) => {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      paddingHorizontal: 15,
-      paddingVertical: 10,
-      backgroundColor: "white",
-      gap: 10,
+        flex: 1,
+        paddingHorizontal: 15,
+        paddingBottom: 10,
+        backgroundColor: "white",
+        gap: 10,
+    },
+    scrollArea: {
+        gap: 10,
+        paddingTop: 10,
     },
     userProfileImage: {
         width: 40,
@@ -175,6 +191,10 @@ const styles = StyleSheet.create({
     },
     content: {
         fontSize: 16,
+    },
+    attatchedImage: {
+        aspectRatio: 1,
+        borderRadius: 10,
     },
     commentArea: {
         fontSize: 25,

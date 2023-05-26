@@ -1,8 +1,8 @@
+import User from "./User";
+
 type Comment = {
     id: number;
-    userId: number;
-    userName: string;
-    userProfileImage: string;
+    user: User;
     content: string;
     createdAt: string;
     isOwner: boolean;
