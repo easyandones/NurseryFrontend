@@ -1,4 +1,4 @@
-import Comment from '../../Types/CommentType';
+import Comment from '../../Types/Comment';
 
 import { FontAwesome } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';

@@ -1,5 +1,5 @@
 import User from "./User";
-import Comment from "./CommentType";
+import Comment from "./Comment";
 
 type Article = {
     id: number;

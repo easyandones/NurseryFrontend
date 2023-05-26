@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import { Feather, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import LineEdit from '../../components/LineEdit/LineEdit';
 import { useIsFocused } from '@react-navigation/native';
-import Comment from '../../Types/CommentType';
+import Comment from '../../Types/Comment';
 import CommentView from '../../components/Article/CommentView';
-import Article from '../../Types/ArticleType';
+import Article from '../../Types/Article';
 
 
 const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");

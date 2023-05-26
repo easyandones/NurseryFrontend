@@ -1,4 +1,4 @@
-import Article from '../../Types/ArticleType';
+import Article from '../../Types/Article';
 
 import { ScrollView, StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';

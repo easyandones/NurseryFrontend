@@ -1,4 +1,4 @@
-import Article from '../../Types/ArticleType';
+import Article from '../../Types/Article';
 
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
