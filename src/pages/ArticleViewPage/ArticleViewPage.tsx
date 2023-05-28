@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Feather, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import LineEdit from '../../components/LineEdit/LineEdit';
@@ -8,7 +8,10 @@ import CommentView from '../../components/Article/CommentView';
 import Article from '../../Types/Article';
 
 
-const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");
+//REMOVE THIS TOKEN
+const DEV_TMP_TOKEN = "";
+//REMOVE THIS TOKEN
+
 
 const ArticleViewPage = (props: any) => {
     const [loading, setLoading] = useState(true);
@@ -18,18 +21,42 @@ const ArticleViewPage = (props: any) => {
 
     const refreshArticle = async() => {
         setLoading(true);
-        console.log("refresh article"); //게시글 불러오는 API
-        //const response = await fetch("https://hub.dummyapis.com/delay?seconds=1");
-        //const response = await fetch(
-            //`https://api.kmu_wink.com/article?id=${article.id}&token=${OAUTH_TOKEN}`,
-            //{
-                //method: "POST"
-            //}
-        //);
-        //const json = await response.json();
-        const json = props.route.params.article; //임시 데이터
-        const article: Article = json;
-        setArticle(article);
+        try {
+            const response = await fetch(
+                `http://43.200.253.12:8080/api/article/${props.route.params.article.id}`,
+                {
+                    headers: {
+                        Authorization: DEV_TMP_TOKEN //토큰 불러오는 함수로 교체
+                    }
+                }
+            );
+            const json = await response.json();
+    
+    
+            //호환성 유지 데이터 변환
+            json.article.user = {
+                id: json.article.userId,
+                displayName: json.article.userName,
+                profileImageURL: `http://43.200.253.12:8080/home/ubuntu/${json.article.userProfileImage}`
+            };
+            json.article.comments = json.article.comments.map((value: any, index: number) => {
+                let comment = {...value};
+                comment.user = {
+                    id: value.userId,
+                    displayName: value.userName,
+                    profileImageURL: `http://43.200.253.12:8080/home/ubuntu/${value.displayName}`
+                };
+                return comment;
+            });
+            json.article.attachedImageURL = [];
+            //호환성 유지 데이터 변환
+    
+            const article: Article = json.article;
+            setArticle(article);
+        }
+        catch {
+            alert("네트워크 오류");
+        }
         setLoading(false);
     };
     useEffect(() => {
@@ -39,8 +66,23 @@ const ArticleViewPage = (props: any) => {
     }, [isFocused]);
 
     const toggleLike = async() => {
-        //좋아요 API
-        console.log("toggle like", article.id);
+        try {
+            const response = await fetch(
+                `http://43.200.253.12:8080/api/article/${article.id}/heart`,
+                {
+                    method: article.liked ? "DELETE" : "POST",
+                    headers: {
+                        Authorization: DEV_TMP_TOKEN //토큰 불러오는 함수로 교체
+                    },
+                }
+            );
+            const json = await response.json();
+            console.log(json);
+        }
+        catch (e) {
+            console.log(e);
+            alert("네트워크 오류");
+        }
         if (article.liked) {
             setArticle({...article, liked: false, likesCount: article.likesCount - 1});
         }
@@ -55,25 +97,78 @@ const ArticleViewPage = (props: any) => {
 
     const deleteArticle = async() => {
         setLoading(true);
-        //삭제 API
-        console.log("delete", article.id);
-        props.navigation.navigate('게시글 목록');
+        try {
+            const response = await fetch(
+                `http://43.200.253.12:8080/api/article/${article.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: DEV_TMP_TOKEN //토큰 불러오는 함수로 교체
+                    },
+                }
+            );
+            const json = await response.json();
+            console.log(json);
+            props.navigation.navigate('게시글 목록');
+        }
+        catch (e) {
+            console.log(e);
+            alert("네트워크 오류");
+        }
         setLoading(false);
     };
 
     const addComment = async() => {
+        if (comment === "") {
+            alert("댓글을 입력하세요.");
+            return;
+        }
         setLoading(true);
-        //댓글 등록 API
-        console.log("add comment", comment);
-        setComment("");
+        try {
+            const response = await fetch(
+                `http://43.200.253.12:8080/api/article/${article.id}/comment`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: DEV_TMP_TOKEN, //토큰 불러오는 함수로 교체
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        content: comment,
+                    }),
+                }
+            );
+            const json = await response.json();
+            console.log(json);
+            setComment("");
+        }
+        catch (e) {
+            console.log(e);
+            alert("네트워크 오류");
+        }
         setLoading(false);
         refreshArticle();
     };
 
     const deleteComment = async(commentId: number) => {
         setLoading(true);
-        //댓글 삭제 API
-        console.log("delete comment", commentId);
+        try {
+            const response = await fetch(
+                `http://43.200.253.12:8080/api/article/${article.id}/comment/${commentId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: DEV_TMP_TOKEN //토큰 불러오는 함수로 교체
+                    },
+                }
+            );
+            const json = await response.json();
+            console.log(json);
+        }
+        catch (e) {
+            console.log(e);
+            alert("네트워크 오류");
+        }
         setLoading(false);
         refreshArticle();
     };

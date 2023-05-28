@@ -1,96 +1,80 @@
 import Article from '../../Types/Article';
 
-import { ScrollView, StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { useEffect, useState } from 'react';
 import ArticlePreview from './ArticlePreview';
 import { useIsFocused } from '@react-navigation/native';
 
 
+//REMOVE THIS TOKEN
+const DEV_TMP_TOKEN = "";
+//REMOVE THIS TOKEN
+
+
 const ArticleList = (props: any) => {
     const [articleList, setArticleList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [hasNextPage, setHasNextPage] = useState(true);
-    const [cursor, setCursor] = useState("");
+    let hasNextPage = true;
+    let cursor = "";
     const isCloseToBottom = (event: any) => {
         return event.layoutMeasurement.height + event.contentOffset.y >= event.contentSize.height - 20;
     };
     const isFocused = useIsFocused();
     const getArticleList = async(prevArticleList: any) => {
-        console.log("loading articles");
         if (loading || !hasNextPage) {
             return;
         }
         setLoading(true);
-        //const response = await fetch("https://hub.dummyapis.com/delay?seconds=1");
-        //const response = await fetch(
-            //`https://api.kmu_wink.com/articleList?board=${props.boardType}&sort=${props.sortType}&cursor=${cursor}&limit=20&token=${OAUTH_TOKEN}`,
-            //{
-                //method: "POST"
-            //}
-        //);
-        //const json = await response.json();
-        const json: any = { //임시 테스트 데이터
-            articleList: Array.from({length: 10}, () => (
+
+        try {
+            const response = await fetch(
+                `http://43.200.253.12:8080/api/articles?boardType=${props.boardType}&sortType=${props.sortType}`,
                 {
-                    id: Math.floor(Math.random() * 1000),
-                    boardType: props.boardType,
-                    user: {
-                        id: Math.floor(Math.random() * 1000),
-                        displayName: `사용자${Math.floor(Math.random() * 1000)}`,
-                        profileImageURL: "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg"
-                    },
-                    title: [
-                        "제목입니다.",
-                        "아아아아아아아아 제목 테스트입니다. 아아아아 가나다라마바사 이것은 글이다. 안녕하세요. 테스트",
-                        "아아아아ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ",
-                        "ㅁㄴㅇㄹ",
-                    ][Math.floor(Math.random() * 4)],
-                    content: [
-                        "내용입니다.",
-                        "아아아아아아아아 게시글 테스트입니다. 아아아아 가나다라마바사 이것은 글이다. 안녕하세요. 테스트",
-                        "아아아아ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ",
-                        "ㅁㄴㅇㄹ",
-                    ][Math.floor(Math.random() * 4)],
-                    attachedImageURL: Array.from({length: Math.floor(Math.random() * 4)}, () => {
-                        const keyword = ["nature", "space", "programming", "bus", "school"][Math.floor(Math.random() * 5)];
-                        return `https://source.unsplash.com/random/?${keyword}`;
-                    }),
-                    createdAt: "2023-05-21 11:14",
-                    likesCount: Math.floor(Math.random() * 99) + 1,
-                    comments: Array.from({length: Math.floor(Math.random() * 10)}, (item, index) => (
-                        {
-                            id: index,
-                            user: {
-                                id: Math.floor(Math.random() * 1000),
-                                displayName: `사용자${Math.floor(Math.random() * 1000)}`,
-                                profileImageURL: "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg"
-                            },
-                            content: [
-                                "댓글입니다.",
-                                "아아아아아아아아 댓글 테스트입니다. 아아아아 가나다라마바사 이것은 글이다. 안녕하세요. 테스트",
-                                "아아아아ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ",
-                                "ㅁㄴㅇㄹ",
-                            ][Math.floor(Math.random() * 4)],
-                            createdAt: "2023-05-21 11:14",
-                            isOwner: [true, false][Math.floor(Math.random() * 2)],
-                        }
-                    )),
-                    liked: [true, false][Math.floor(Math.random() * 2)],
-                    isOwner: [true, false][Math.floor(Math.random() * 2)],
+                    headers: {
+                        Authorization: DEV_TMP_TOKEN //토큰 불러오는 함수로 교체
+                    }
                 }
-            )),
-            hasNextPage: true,
-            cursor: "abcdefg"
-        };
-        setArticleList([...prevArticleList, ...json.articleList] as never);
-        setHasNextPage(json.hasNextPage);
-        setCursor(json.cursor);
+            );
+            const json = await response.json();
+    
+            //호환성 유지 데이터 변환
+            json.articleList = json.articleList.map((value: any, index: number) => {
+                let article = {...value};
+                article.user = {
+                    id: value.userId,
+                    displayName: value.userName,
+                    profileImageURL: `http://43.200.253.12:8080/home/ubuntu/${value.userProfileImage}`
+                };
+                article.comments = value.comments.map((value: any, index: number) => {
+                    let comment = {...value};
+                    comment.user = {
+                        id: value.userId,
+                        displayName: value.userName,
+                        profileImageURL: `http://43.200.253.12:8080/home/ubuntu/${value.userProfileImage}`
+                    };
+                    return comment;
+                });
+                article.attachedImageURL = [];
+                return article;
+            });
+            json.hasNextPage = false;
+            json.cursor = "abcdefg";
+            //호환성 유지 데이터 변환
+    
+            setArticleList([...prevArticleList, ...json.articleList] as never);
+            hasNextPage = json.hasNextPage;
+            cursor = json.cursor;
+        }
+        catch {
+            alert("네트워크 오류");
+        }
+
         setLoading(false);
     };
     useEffect(() => {
         if (isFocused) {
-            setHasNextPage(true);
-            setCursor("");
+            hasNextPage = true;
+            cursor = "";
             setArticleList([]);
             getArticleList([]);
         }
@@ -106,10 +90,12 @@ const ArticleList = (props: any) => {
                 {...props}
             >
                 <View style={styles.container}>
-                    {
-                        articleList.map((article: Article, index) => (
-                            <ArticlePreview key={index} article={article} navigation={props.navigation} />
-                        ))
+                    {articleList.length ?
+                            articleList.map((article: Article, index) => (
+                                <ArticlePreview key={index} article={article} navigation={props.navigation} />
+                            ))
+                        :
+                            <Text style={{textAlign: "center", fontSize: 15, fontWeight: "bold", padding: 10}}>게시글이 없습니다.</Text>
                     }
                 </View>
                 {loading ?

@@ -2,6 +2,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
 import LineEdit from '../../components/LineEdit/LineEdit';
 import {Picker} from '@react-native-picker/picker';
+import MultipleImagePicker from '../../components/ImagePicker/MultipleImagePicker';
+
+
+//REMOVE THIS TOKEN
+const DEV_TMP_TOKEN = "";
+//REMOVE THIS TOKEN
 
 
 const ArticleWritePage = (props: any) => {
@@ -9,6 +15,7 @@ const ArticleWritePage = (props: any) => {
     const [boardType, setBoardType] = useState(props.route.params?.article?.boardType || props.route.params.boardType);
     const [title, setTitle] = useState(article ? article.title : "");
     const [content, setContent] = useState(article ? article.content : "");
+    const [images, setImages] = useState(article ? article.attachedImageURL : []);
 
     const [loading, setLoading] = useState(false);
     const sendForm = async() => {
@@ -29,10 +36,55 @@ const ArticleWritePage = (props: any) => {
             content
         });
         if (article === undefined) {
-            //새글 작성 API
+            try {
+                const response = await fetch(
+                    `http://43.200.253.12:8080/api/article`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: DEV_TMP_TOKEN, //토큰 불러오는 함수로 교체
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            boardType,
+                            title,
+                            content,
+                        }),
+                    }
+                );
+                const json = await response.json();
+                console.log(json);
+            }
+            catch (e) {
+                console.log(e);
+                alert("네트워크 오류");
+            }
         }
         else {
-            //글 수정 API
+            try {
+                const response = await fetch(
+                    `http://43.200.253.12:8080/api/article/${article.id}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            Authorization: DEV_TMP_TOKEN, //토큰 불러오는 함수로 교체
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            boardType,
+                            title,
+                            content,
+                            images
+                        }),
+                    }
+                );
+                const json = await response.json();
+                console.log(json);
+            }
+            catch (e) {
+                console.log(e);
+                alert("네트워크 오류");
+            }
         }
         setLoading(false);
         props.navigation.goBack();
@@ -73,6 +125,7 @@ const ArticleWritePage = (props: any) => {
                     textAlignVertical="top"
                     style={{...styles.lineEdit, flex: 1}}
                 />
+                <MultipleImagePicker onChange={setImages} />
                 <TouchableOpacity onPress={sendForm} style={{borderRadius: 30, backgroundColor: "black", paddingHorizontal: 30, paddingVertical: 15}}>
                     <Text style={{color: "white", fontSize: 18, fontWeight: "500", textAlign: "center"}}>{article ? "수정" : "등록"}</Text>
                 </TouchableOpacity>
