@@ -15,7 +15,7 @@ const ArticleWritePage = (props: any) => {
     const [boardType, setBoardType] = useState(props.route.params?.article?.boardType || props.route.params.boardType);
     const [title, setTitle] = useState(article ? article.title : "");
     const [content, setContent] = useState(article ? article.content : "");
-    const [images, setImages] = useState(article ? article.attachedImageURL : []);
+    const [images, setImages] = useState(article ? article.attachedImageURLs : []);
 
     const [loading, setLoading] = useState(false);
     const sendForm = async() => {

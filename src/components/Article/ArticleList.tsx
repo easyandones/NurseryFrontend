@@ -43,18 +43,20 @@ const ArticleList = (props: any) => {
                 article.user = {
                     id: value.userId,
                     displayName: value.userName,
-                    profileImageURL: `http://43.200.253.12:8080/home/ubuntu/${value.userProfileImage}`
+                    profileImageURL: `http://43.200.253.12:8080/api/users/image/${value.userId}`
                 };
                 article.comments = value.comments.map((value: any, index: number) => {
                     let comment = {...value};
                     comment.user = {
                         id: value.userId,
                         displayName: value.userName,
-                        profileImageURL: `http://43.200.253.12:8080/home/ubuntu/${value.userProfileImage}`
+                        profileImageURL: `http://43.200.253.12:8080/api/users/image/${value.userId}`
                     };
                     return comment;
                 });
-                article.attachedImageURL = [];
+                article.attachedImageURLs = value.attachedImageURLs.map((value: any, index: number) => {
+                    return `http://43.200.253.12:8080/api/image/${value}`;
+                });
                 return article;
             });
             json.hasNextPage = false;

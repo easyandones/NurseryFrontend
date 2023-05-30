@@ -7,7 +7,7 @@ type Article = {
     user: User;
     title: string;
     content: string;
-    attachedImageURL: string[];
+    attachedImageURLs: string[];
     createdAt: string;
     likesCount: number;
     comments: Comment[];

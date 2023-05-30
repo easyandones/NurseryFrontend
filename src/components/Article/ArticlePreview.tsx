@@ -18,8 +18,8 @@ const ArticlePreview = (props: any) => {
                             {article.content}
                         </Text>
                     </View>
-                    {article.attachedImageURL.length ?
-                        <Image style={styles.attatchedImage} source={{uri: article.attachedImageURL[0]}} />
+                    {article.attachedImageURLs.length ?
+                        <Image style={styles.attatchedImage} source={{uri: article.attachedImageURLs[0]}} />
                     :
                         null
                     }

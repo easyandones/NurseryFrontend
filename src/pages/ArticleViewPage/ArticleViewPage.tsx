@@ -48,7 +48,9 @@ const ArticleViewPage = (props: any) => {
                 };
                 return comment;
             });
-            json.article.attachedImageURL = [];
+            json.article.attachedImageURLs = json.article.attachedImageURLs.map((value: any, index: number) => {
+                return `http://43.200.253.12:8080/api/image/${value}`;
+            });
             //호환성 유지 데이터 변환
     
             const article: Article = json.article;
@@ -214,7 +216,7 @@ const ArticleViewPage = (props: any) => {
                             {article.content}
                         </Text>
                         {
-                            article.attachedImageURL.map((url: string, index: number) => (
+                            article.attachedImageURLs.map((url: string, index: number) => (
                                 <Image key={index} style={styles.attatchedImage} source={{uri: url}} />
                             ))
                         }
